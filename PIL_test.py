@@ -1,4 +1,5 @@
 from PIL import Image
+import time
 
 # 画像データを生成
 size = (40, 40)
@@ -16,4 +17,4 @@ for i in range(4):
         for k in range(i*10,i*10+10):
             for l in range(j*10,j*10+10):
                 img.putpixel((l, k), Pixel_table[i*4+j])
-img.save("sample.png", quality=95)
+img.save("image/"+str(int(time.time()))+".png", quality=95)
