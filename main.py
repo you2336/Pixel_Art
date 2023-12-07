@@ -1,51 +1,46 @@
-import bmp_Creater as BC
-import bmp_to_png as btp
-
 from tkinter import *
-import datetime
+from PNGcreater import create_PNG
+import math
 
 if __name__ == '__main__':
 
-    c_table = []
+    #１Pixelのサイズ
+    PixelSize = 10
+    #縦横のPixel数
+    len = 100
+    #カラーテーブル
+    color_table=[]
+    
     button= []
     color_code = "#000000"
     def RGB_convert(i):
         return(hex(i))
         
     def clicked(event):
-        print('クリックしました')
+        #print('クリックしました')
         event.widget.config(bg=color_code)
 
     def print_b():
-        c_table.clear()
-        pixels=[0x12, 0x13, 0x14, 0x15,
-                0x08, 0x09, 0x10, 0x11,
-                0x04, 0x05, 0x06, 0x07,
-                0x00, 0x01, 0x02, 0x03,]
-
-        for i in range(4):
-            for j in range(4):
-                today = datetime.datetime.utcnow().date()
-                #c_table.append((button[i*4+j].cget('background')))
-                
-                c_table.append(int(button[i*4+j].cget('background')[1:3],16))
-                c_table.append(int(button[i*4+j].cget('background')[3:5],16))
-                c_table.append(int(button[i*4+j].cget('background')[5:7],16))
-                c_table.append(0)
-                
-
-        for i in range(4):
-            for j in range(4):
-                print(str(i*4+j).rjust(2),end='  ')
-                for k in range(4):
-                    print(str(c_table[i*4**2+j*4+k]).rjust(3),end=" ")
-                #print("",end=": ")
-            print('')
-        BC.writeBmp("images/bmp/"+str(today)+'.bmp', 4, 4, c_table, pixels)
+        global hoge_table
+        color_table.clear()
+        for i in button:
+            color_table.append((         
+            int(i["bg"][1:3],16),
+            int(i["bg"][3:5],16),
+            int(i["bg"][5:7],16),
+            int(255)
+            )
+            )
+            
+        #print(color_table)
         
-        btp.btp()
-        #print(c_table[0:4],c_table[4:8],c_table[8:12],c_table[12:16],)
-        
+        #len, PixelSize, Pixel_table
+        create_PNG(len, PixelSize, color_table)
+ 
+               
+    
+    def back_b():
+        root.destroy()   
         
     def slider_scroll(i):
         global color_code
@@ -62,7 +57,7 @@ if __name__ == '__main__':
     root = Tk() # この下に画面構成を記述
     
     # ----------- ①Window作成 ----------- #
-    root.title('tkinterの使い方')   # 画面タイトル設定
+    root.title('PINGcreater')   # 画面タイトル設定
     #root.geometry('500x500')       # 画面サイズ設定
     root.attributes('-fullscreen', True)
     root.resizable(False, False)   # リサイズ不可に設定
@@ -71,29 +66,29 @@ if __name__ == '__main__':
     # ----------- ②Frameを定義 ----------- #
     frame1 = Frame(root, width=600, height=600, borderwidth=2, relief='solid')
     frame2 = Frame(root, width=300, height=300, borderwidth=1, relief='solid', bg='#000000')
-    print_b = Button(root, width=38, height=8, borderwidth=1,text="PRINT",command=print_b)
+    printbutton = Button(root, width=38, height=8, borderwidth=1,text="画像作成",command=print_b, bg='#BBBBBB')
+    backbutton = Button(root, width=38, height=8, borderwidth=1,text="タイトルへ戻る",command=back_b, bg='#BBBBBB')
     
     # Frameサイズを固定
     frame1.propagate(False)
 
- 
     # Frameを配置（grid）
     frame1.place(x = 110, y = 140)
     frame2.place(x = 800, y = 140)
-    print_b.place(x = 1130, y = 140)
-
- 
+    printbutton.place(x = 1130, y = 140)
+    backbutton.place(x = 1130, y = 300)
  
     # ---------- ③Widget配置  ----------- #
     # label(フレーム1左上)
 
     RGB = []
-    high=0
-    for i in range(4):
-        for j in range(4):
-            button.append(Button(frame1,width=20, height=10,command=clicked,bg='#ffffff'))
-            button[(i*4)+j].place(x = j*149,  y = high)
-            button[(i*4)+j].bind("<ButtonPress>", clicked)
+    pixel_size = int(600/len)
+    high = 0
+    for i in range(len):
+        for j in range(len):
+            button.append(Button(frame1,width=pixel_size, height=pixel_size,command=clicked,bg='#ffffff'))
+            button[(i*len)+j].place(x = j*pixel_size,  y = i*pixel_size)
+            button[(i*len)+j].bind("<ButtonPress>", clicked)
         high += 145
 
     for i in range(3):    
@@ -110,8 +105,6 @@ if __name__ == '__main__':
                     #variable=slider_scroll,
                            ))
         RGB[i].place(x = 800, y = 470+i*100)                                        
-
- 
  
     root.mainloop()
 
